@@ -1,0 +1,13 @@
+{
+  "name": "pianotype",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Damián Silvani <munshkr@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "midi": "^0.9.5"
+  }
+}
