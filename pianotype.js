@@ -1,11 +1,38 @@
+const argv = require('yargs')
+  .usage('Usage: $0 [options]')
+  .argv;
+
 const process = require('process');
 const midi = require('midi');
 
-// Set up a new input.
+// Set up a new input and output.
 const input = new midi.input();
+const output = new midi.output();
+
+function listPorts(port) {
+  for (let i = 0; i < port.getPortCount(); i++) {
+    console.log(`- ${i}: ${port.getPortName(i)}`);
+  }
+}
+
+if (argv.list) {
+  console.log("List of input ports");
+  listPorts(input);
+  console.log("List of output ports");
+  listPorts(output);
+  process.exit(0);
+}
+
+const inPort = argv.i;
+const outPort = argv.o;
+
+const keyMap = {}
 
 // Get the name of a specified input port.
-console.log(input.getPortName(1));
+console.log(`Input port: ${input.getPortName(inPort)}`);
+if (outPort) {
+  console.log(`Output port: ${output.getPortName(outPort)}`);
+}
 
 // Configure a callback.
 input.on('message', function(deltaTime, message) {
@@ -14,10 +41,18 @@ input.on('message', function(deltaTime, message) {
   // https://www.cs.cf.ac.uk/Dave/Multimedia/node158.html has some helpful
   // information interpreting the messages.
   console.log('m:' + message + ' d:' + deltaTime);
+
+  // Send a MIDI message.
+  if (outPort) {
+    output.sendMessage(message);
+  }
 });
 
 // Open the first available input port.
-input.openPort(1);
+if (outPort) {
+  output.openPort(outPort);
+}
+input.openPort(inPort);
 
 // Sysex, timing, and active sensing messages are ignored
 // by default. To enable these message types, pass false for
@@ -32,6 +67,9 @@ process.on('SIGINT', function() {
     console.log("Caught interrupt signal");
 
 		// Close the port when done.
-		input.closePort();
+    input.closePort();
+    if (outPort) {
+      output.closePort();
+    }
     process.exit();
 });

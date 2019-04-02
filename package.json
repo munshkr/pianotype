@@ -5,9 +5,10 @@
   "author": "Damián Silvani <munshkr@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js"
+    "start": "node pianotype.js"
   },
   "dependencies": {
-    "midi": "^0.9.5"
+    "midi": "^0.9.5",
+    "yargs": "^13.2.2"
   }
 }
