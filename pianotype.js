@@ -39,6 +39,11 @@ if (argv.list) {
   process.exit(0);
 }
 
+if (input.getPortCount() == 0) {
+  console.error("There are no MIDI input devices");
+  process.exit(1);
+}
+
 const keys = [
   "z", "x", "k", "b", "y", "f", "m", "d", "h", "n", "o", "t", "c",
   "l", "e", "a", "i", "s", "r", "u", "w", "g", "p", "v", "j", "q"
@@ -54,7 +59,7 @@ const minorScale = [0, 2, 3, 5, 7, 8, 10];
 const scale = majorScale;
 const rootKey = 60;
 
-const inPort = argv.i;
+const inPort = argv.i || 0;
 const outPort = argv.o;
 
 const keyMap = buildMap(rootKey, scale);
