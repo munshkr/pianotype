@@ -15,6 +15,22 @@ function listPorts(port) {
   }
 }
 
+function mod(n, m) {
+  return ((n%m)+m)%m;
+}
+
+function buildMap(rootKey, scale) {
+  let map = {};
+  for (let i = 0; i < 26; i++) {
+    const j = i - 14;
+    const k = scale[mod(j, scale.length)] + 12 * Math.floor(j / scale.length);
+    const note = rootKey + k;
+    map[note] = keys[i];
+  }
+  return map;
+}
+
+
 if (argv.list) {
   console.log("List of input ports");
   listPorts(input);
@@ -23,10 +39,19 @@ if (argv.list) {
   process.exit(0);
 }
 
+const keys = [
+  "z", "x", "k", "b", "y", "f", "m", "d", "h", "n", "o", "t", "c",
+  "l", "e", "a", "i", "s", "r", "u", "w", "g", "p", "v", "j", "q"
+];
+
+const scale = [0, 2, 4, 5, 7, 9, 11] // major scale
+const rootKey = 60
+
 const inPort = argv.i;
 const outPort = argv.o;
 
-const keyMap = {}
+const keyMap = buildMap(rootKey, scale);
+console.log(keyMap)
 
 // Get the name of a specified input port.
 console.log(`Input port: ${input.getPortName(inPort)}`);
@@ -40,7 +65,19 @@ input.on('message', function(deltaTime, message) {
   //   [status, data1, data2]
   // https://www.cs.cf.ac.uk/Dave/Multimedia/node158.html has some helpful
   // information interpreting the messages.
-  console.log('m:' + message + ' d:' + deltaTime);
+
+  // console.log('m:' + message + ' d:' + deltaTime);
+  const [status, data1, data2] = message;
+
+  // If velocity is not 0, it is key on
+  if (data2 > 0) {
+    const key = keyMap[data1];
+    if (key) {
+      process.stdout.write(key);
+    // } else {
+      // console.log(message);
+    }
+  }
 
   // Send a MIDI message.
   if (outPort) {
@@ -53,15 +90,6 @@ if (outPort) {
   output.openPort(outPort);
 }
 input.openPort(inPort);
-
-// Sysex, timing, and active sensing messages are ignored
-// by default. To enable these message types, pass false for
-// the appropriate type in the function below.
-// Order: (Sysex, Timing, Active Sensing)
-// For example if you want to receive only MIDI Clock beats
-// you should use
-// input.ignoreTypes(true, false, true)
-input.ignoreTypes(false, false, false);
 
 process.on('SIGINT', function() {
     console.log("Caught interrupt signal");
