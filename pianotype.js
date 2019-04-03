@@ -44,14 +44,20 @@ const keys = [
   "l", "e", "a", "i", "s", "r", "u", "w", "g", "p", "v", "j", "q"
 ];
 
-const scale = [0, 2, 4, 5, 7, 9, 11] // major scale
-const rootKey = 60
+const velocityThreshold = 75;
+
+// Scales
+const majorScale = [0, 2, 4, 5, 7, 9, 11];
+const minorScale = [0, 2, 3, 5, 7, 8, 10];
+
+const scale = minorScale;
+const rootKey = 60;
 
 const inPort = argv.i;
 const outPort = argv.o;
 
 const keyMap = buildMap(rootKey, scale);
-console.log(keyMap)
+// console.log(keyMap)
 
 // Get the name of a specified input port.
 console.log(`Input port: ${input.getPortName(inPort)}`);
@@ -67,15 +73,17 @@ input.on('message', function(deltaTime, message) {
   // information interpreting the messages.
 
   // console.log('m:' + message + ' d:' + deltaTime);
-  const [status, data1, data2] = message;
+  const [status, midinote, velocity] = message;
 
   // If velocity is not 0, it is key on
-  if (data2 > 0) {
-    const key = keyMap[data1];
+  if (velocity > 0) {
+    let key = keyMap[midinote];
     if (key) {
-      process.stdout.write(key);
-    // } else {
-      // console.log(message);
+      if (velocity >= velocityThreshold) {
+        key = key.toUpperCase();
+      }
+      //process.stdout.write(key);
+      console.log(`Character: ${key}`)
     }
   }
 
@@ -84,6 +92,8 @@ input.on('message', function(deltaTime, message) {
     output.sendMessage(message);
   }
 });
+
+console.log("Ready!")
 
 // Open the first available input port.
 if (outPort) {
