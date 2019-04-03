@@ -26,7 +26,14 @@ This is the current state of things:
 
 ## Usage
 
-Run `node pianotype.js --list` first to list your MIDI devices (input and output)
+Connect your MIDI keyboard, and run `node pianotype.js`. By default it will use
+the first input device.
+
+Otherwise, if you want to use another device, run `node pianotype.js --list`
+first to list your MIDI devices (input and output), and then specify it by
+index with the `-i` option. For example, if your device has index 2, run `node
+pianotype.js -i 2`.
+
 If you are using Windows, you may have to use LoopMIDI or something like that
 to redirect MIDI keys to some DAW.  You can tell `pianotype` to redirect the MIDI
 messages it receives to an output device (in this case it would be loopMIDI).
