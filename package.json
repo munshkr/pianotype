@@ -1,9 +1,10 @@
 {
   "name": "pianotype",
   "version": "1.0.0",
+  "description": "Type using a MIDI keyboard",
   "main": "index.js",
   "author": "Damián Silvani <munshkr@gmail.com>",
-  "license": "MIT",
+  "license": "GPL-3.0+",
   "scripts": {
     "start": "node pianotype.js"
   },

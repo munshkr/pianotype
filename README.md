@@ -1,8 +1,9 @@
-# pianotype
+# Pianotype
 
 Type using a MIDI keyboard (or whatever MIDI instrument you have)
 
 This was inspired by https://www.youtube.com/watch?v=MAYlMcyVZ2k
+
 
 ## Usage
 
@@ -33,3 +34,8 @@ List of output ports
 ```
 
 - Enable loopMIDI Port 0 input device on Ableton Live
+
+
+## License
+
+GPL 3+. Refer to [LICENSE.txt](LICENSE.txt)
