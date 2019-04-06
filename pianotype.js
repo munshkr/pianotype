@@ -2,6 +2,7 @@ const argv = require("yargs").usage("Usage: $0 [options]").argv;
 
 const process = require("process");
 const midi = require("midi");
+const robot = require("robotjs");
 
 // Set up a new input and output.
 const input = new midi.input();
@@ -71,7 +72,7 @@ const keys = [
 ];
 
 const velocityThreshold = 75;
-const chordThresholdMs = 30;
+const chordThresholdMs = 40;
 
 // Scales
 const majorScale = [0, 2, 4, 5, 7, 9, 11];
@@ -117,6 +118,7 @@ function evalKeys() {
       // Command: Delete character
       const [a, b] = sortPair(midinotes);
       if (b === a + 1) {
+        robot.keyTap("backspace");
         console.log(`Command: Delete character`);
         return;
       }
@@ -130,21 +132,31 @@ function evalKeys() {
         // Command: 2nd
         switch (interval) {
           case 1: // octave?
+            robot.keyTap("end");
+            robot.keyTap("home", "shift");
+            robot.keyTap("delete");
             console.log(`Command: Delete line`);
             break;
           case 2:
+            robot.keyTap("space");
             console.log(`Command: Space`);
             break;
           case 3:
+            robot.typeString(",");
             console.log(`Command: Comma`);
             break;
           case 4:
+            robot.typeString(".");
             console.log(`Command: Period`);
             break;
           case 5:
+            robot.keyTap("enter");
             console.log(`Command: New line`);
             break;
           case 6:
+            robot.keyTap("left", "control");
+            robot.keyTap("right", ["control", "shift"]);
+            robot.keyTap("delete");
             console.log(`Command: Delete word`);
             break;
         }
@@ -158,7 +170,7 @@ function evalKeys() {
       if (velocity >= velocityThreshold) {
         key = key.toUpperCase();
       }
-      //process.stdout.write(key);
+      robot.typeString(key);
       console.log(`Character: ${key} (${velocity})`);
     }
   }
