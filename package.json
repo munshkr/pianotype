@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "midi": "^0.9.5",
+    "robotjs": "^0.5.1",
     "yargs": "^13.2.2"
   }
 }
