@@ -1,9 +1,7 @@
-const argv = require('yargs')
-  .usage('Usage: $0 [options]')
-  .argv;
+const argv = require("yargs").usage("Usage: $0 [options]").argv;
 
-const process = require('process');
-const midi = require('midi');
+const process = require("process");
+const midi = require("midi");
 
 // Set up a new input and output.
 const input = new midi.input();
@@ -16,7 +14,7 @@ function listPorts(port) {
 }
 
 function mod(n, m) {
-  return ((n%m)+m)%m;
+  return ((n % m) + m) % m;
 }
 
 function buildMap(rootKey, scale) {
@@ -29,7 +27,6 @@ function buildMap(rootKey, scale) {
   }
   return map;
 }
-
 
 if (argv.list) {
   console.log("List of input ports");
@@ -45,8 +42,32 @@ if (input.getPortCount() == 0) {
 }
 
 const keys = [
-  "z", "x", "k", "b", "y", "f", "m", "d", "h", "n", "o", "t", "c",
-  "l", "e", "a", "i", "s", "r", "u", "w", "g", "p", "v", "j", "q"
+  "z",
+  "x",
+  "k",
+  "b",
+  "y",
+  "f",
+  "m",
+  "d",
+  "h",
+  "n",
+  "o",
+  "t",
+  "c",
+  "l",
+  "e",
+  "a",
+  "i",
+  "s",
+  "r",
+  "u",
+  "w",
+  "g",
+  "p",
+  "v",
+  "j",
+  "q"
 ];
 
 const velocityThreshold = 75;
@@ -75,9 +96,9 @@ let pressedNotes = [];
 let lastTime = Date.now();
 
 function midinoteToDegree(rootKey, scale, n) {
-  console.log(`midinoteToDegree(${rootKey}, ${scale}, ${n})`)
+  console.log(`midinoteToDegree(${rootKey}, ${scale}, ${n})`);
   const res = scale.findIndex(d => n % 12 === d);
-  return res === -1 ? null : (res + 1);
+  return res === -1 ? null : res + 1;
 }
 
 function sortPair([a, b]) {
@@ -93,42 +114,42 @@ function evalKeys() {
     // console.log(`Chord: ${JSON.stringify(notes)}`);
 
     if (midinotes.length === 2) {
-
       // Command: Delete character
       const [a, b] = sortPair(midinotes);
       if (b === a + 1) {
-        console.log(`Command: Delete character`)
+        console.log(`Command: Delete character`);
         return;
       }
 
       // Degree intervals
-      const [da, db] = sortPair(midinotes.map(n => midinoteToDegree(rootKey, scale, n)));
+      const [da, db] = sortPair(
+        midinotes.map(n => midinoteToDegree(rootKey, scale, n))
+      );
       if (da) {
         const interval = db - da + 1;
         // Command: 2nd
         switch (interval) {
           case 1: // octave?
-            console.log(`Command: Delete line`)
+            console.log(`Command: Delete line`);
             break;
           case 2:
-            console.log(`Command: Space`)
+            console.log(`Command: Space`);
             break;
           case 3:
-            console.log(`Command: Comma`)
+            console.log(`Command: Comma`);
             break;
           case 4:
-            console.log(`Command: Period`)
+            console.log(`Command: Period`);
             break;
           case 5:
-            console.log(`Command: New line`)
+            console.log(`Command: New line`);
             break;
           case 6:
-            console.log(`Command: Delete word`)
+            console.log(`Command: Delete word`);
             break;
         }
       }
     }
-    
   } else if (notes.length === 1) {
     const [midinote, velocity] = notes[0];
     let key = keyMap[midinote];
@@ -138,13 +159,13 @@ function evalKeys() {
         key = key.toUpperCase();
       }
       //process.stdout.write(key);
-      console.log(`Character: ${key} (${velocity})`)
+      console.log(`Character: ${key} (${velocity})`);
     }
   }
 }
 
 // Configure a callback.
-input.on('message', function(deltaTime, message) {
+input.on("message", function(deltaTime, message) {
   // The message is an array of numbers corresponding to the MIDI bytes:
   //   [status, data1, data2]
   // https://www.cs.cf.ac.uk/Dave/Multimedia/node158.html has some helpful
@@ -161,7 +182,7 @@ input.on('message', function(deltaTime, message) {
     const delta = Date.now() - lastTime;
 
     // FIXME Use a constant for 30
-    if (!lastTime || (delta > chordThresholdMs)) {
+    if (!lastTime || delta > chordThresholdMs) {
       lastTime = Date.now();
       setTimeout(() => evalKeys(), chordThresholdMs);
     }
@@ -173,7 +194,7 @@ input.on('message', function(deltaTime, message) {
   }
 });
 
-console.log("Ready!")
+console.log("Ready!");
 
 // Open the first available input port.
 if (outPort) {
@@ -181,13 +202,13 @@ if (outPort) {
 }
 input.openPort(inPort);
 
-process.on('SIGINT', function() {
-    console.log("Caught interrupt signal");
+process.on("SIGINT", function() {
+  console.log("Caught interrupt signal");
 
-		// Close the port when done.
-    input.closePort();
-    if (outPort) {
-      output.closePort();
-    }
-    process.exit();
+  // Close the port when done.
+  input.closePort();
+  if (outPort) {
+    output.closePort();
+  }
+  process.exit();
 });
